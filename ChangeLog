@@ -1,0 +1,6 @@
+2011-12-07 Markus Kappe  <markus.kappe@dix.at>
+	* worked on the code, changed TS configuration completly! When you try to upgrade, you better delete your TS and start over
+	* added OAuth with twitter as an working example	
+
+2011-11-11 Markus Kappe  <markus.kappe@dix.at>
+	* initial code generated with kickstarter
