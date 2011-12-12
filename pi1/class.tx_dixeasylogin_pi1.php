@@ -73,6 +73,7 @@ class tx_dixeasylogin_pi1 extends tslib_pibase {
 			$GLOBALS["TSFE"]->fe_user->setKey("ses", "easylogin_loginType", $loginType);
 		} else {
 			$loginType = $GLOBALS["TSFE"]->fe_user->getKey("ses", "easylogin_loginType");
+			if (!$this->providers[$loginType]) {  $loginType = null; }
 		}
 		if ($loginType) {
 			$provider = $this->providers[$loginType];
@@ -154,7 +155,7 @@ class tx_dixeasylogin_div {
 			self::login($user);
 			self::redirectToSelf();
 		} else {
-			return $GLOBALS['piObj']->pi_getLL('nouser'); // User not found in DB, auto-creation disabled
+			return sprintf($GLOBALS['piObj']->pi_getLL('nouser'), $identifier); // User not found. Please contact the admin of the website to request access to this site. Tell the admin this identifier: %s
 		}
 	}
 

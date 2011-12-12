@@ -8,7 +8,7 @@
 		<languageKey index="default" type="array">
 			<label index="invalid_url">Error: OpenID URL is not in proper format (%s)</label>
 			<label index="error_endpoint">Error while getting OpenID endpoint (%s): %s</label>
-			<label index="nouser">User not found in DB, auto-creation disabled (or auto-creation failed)</label>
+			<label index="nouser">User not found. Please contact the admin of the website to request access to this site. Tell the admin this identifier: %s</label>
 			<label index="error_validate">Error while validating OpenID (%s): %s</label>
 			<label index="error_validate_nocode">Error while validating OpenID %s</label>
 			<label index="error_validate_fb_nocode">Error while validating facebook code-parameter '%s' (no answer)</label>

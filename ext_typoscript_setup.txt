@@ -84,24 +84,24 @@ page.2 {
 	page.headerData.853 = TEXT
 	page.headerData.853.value = <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" type="text/css" />
 [global]
-[globalVar = LIT:0 = {$plugin.tx_dixeasylogin_pi1.methods.felogin}]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.felogin}]
 	plugin.tx_dixeasylogin_pi1.provider.5 >
 [global]
-[globalVar = LIT:0 = {$plugin.tx_dixeasylogin_pi1.methods.google}]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.google}]
 	plugin.tx_dixeasylogin_pi1.provider.10 >
 [global]
-[globalVar = LIT:0 = {$plugin.tx_dixeasylogin_pi1.methods.yahoo}]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.yahoo}]
 	plugin.tx_dixeasylogin_pi1.provider.20 >
 [global]
-[globalVar = LIT:0 = {$plugin.tx_dixeasylogin_pi1.methods.myopenid}]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.myopenid}]
 	plugin.tx_dixeasylogin_pi1.provider.30 >
 [global]
-[globalVar = LIT:0 = {$plugin.tx_dixeasylogin_pi1.methods.wordpress}]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.wordpress}]
 	plugin.tx_dixeasylogin_pi1.provider.40 >
 [global]
-[globalVar = LIT:0 = {$plugin.tx_dixeasylogin_pi1.methods.facebook}]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.facebook}]
 	plugin.tx_dixeasylogin_pi1.provider.50 >
 [global]
-[globalVar = LIT:0 = {$plugin.tx_dixeasylogin_pi1.methods.twitter}]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.twitter}]
 	plugin.tx_dixeasylogin_pi1.provider.60 >
 [global]

@@ -28,12 +28,12 @@ plugin.tx_dixeasylogin_pi1 {
 	twitter_consumerSecret = YOUR-CONSUMER-SECRET
 	
 		# enable or disable login methods
-	methods.felogin = 1
-	methods.google = 1
-	methods.yahoo = 1
-	methods.myopenid = 1
-	methods.wordpress = 1
-	methods.facebook = 1
-	methods.twitter = 1
+	disable.felogin = 0
+	disable.google = 0
+	disable.yahoo = 0
+	disable.myopenid = 0
+	disable.wordpress = 0
+	disable.facebook = 0
+	disable.twitter = 0
 	
 }
