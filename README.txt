@@ -12,7 +12,7 @@ Create a twitter app (https://dev.twitter.com/apps/new) with your domain and wri
    Write down uid of that record.
    That login should work (that means a user storage page with a user record and usergroup record has been created and the GRSP is configured)
 3) Insert a content element "plugin" - "easylogin" on the login page
-4) Insert these constants into your TypoScript template and fit them to your needs:
+4) Include the static TypoScript, insert these constants into your TS template and fit them to your needs:
 
 plugin.tx_dixeasylogin_pi1 {
 		# if jQuery, jQueryUI and the lightness theme should be included by default. 

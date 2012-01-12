@@ -29,4 +29,6 @@ t3lib_div::loadTCA('fe_users');
 t3lib_extMgm::addTCAcolumns('fe_users',$tempColumns,1);
 t3lib_extMgm::addToAllTCAtypes('fe_users','tx_dixeasylogin_openid;;;;1-1-1');
 
+t3lib_extMgm::addStaticFile($_EXTKEY,'static/', 'Easylogin');
+
 ?>

@@ -1,3 +1,7 @@
+2012-01-12 Markus Kappe  <markus.kappe@dix.at>
+	* Redirect according to settings from felogin
+	* moved TS to static template	
+
 2011-12-13 Markus Kappe  <markus.kappe@dix.at>
 	* minor corrections in the manual
 

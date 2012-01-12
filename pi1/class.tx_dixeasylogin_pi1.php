@@ -166,8 +166,9 @@ class tx_dixeasylogin_div {
 	}
 
 	static function redirectToSelf() {
-		$url =  t3lib_div::locationHeaderUrl($GLOBALS['piObj']->pi_getPageLink($GLOBALS['TSFE']->id));
-		header('Location: '.$url);
+		#$url =  t3lib_div::locationHeaderUrl($GLOBALS['piObj']->pi_getPageLink($GLOBALS['TSFE']->id));
+		$url = $GLOBALS['piObj']->cObj->getTypoLink_URL($GLOBALS['TSFE']->id, array('logintype' => 'login'));
+		t3lib_utility_Http::redirect($url);
 	}
 
 	static function fetchUser($identifier) {
