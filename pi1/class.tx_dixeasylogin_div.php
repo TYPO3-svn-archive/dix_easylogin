@@ -31,11 +31,31 @@ class tx_dixeasylogin_div {
 		}
 	}
 
+	/**
+	 * Tries to log in user into TYPO3 front-end by checking if the ID provided by the external 
+	 * auth system matches a record in fe_users in the field tx_dixeasylogin_openid
+	 * If configured so, it will create a user or connect a logged-in user with the given identifier
+	 * 	 
+	 * @param   string $identifier    The identifier as provided by Facebook or other systems. 
+	 * @return  string   Message to be displayed to the user (success / error)
+	 */
 	static function loginFromIdentifier($identifier, $userinfo) {
-		$user = tx_dixeasylogin_div::fetchUser($identifier);
-		if (!$user['uid'] && $GLOBALS['piObj']->conf['allowCreate']) { // config
+		$user = tx_dixeasylogin_div::fetchUserByIdentifier($identifier);
+		$fe_user = $GLOBALS['TSFE']->fe_user->fetchUserSession();
+		
+		if ($fe_user['uid']) { // user already logged in -> try to update the identifier
+			if ($GLOBALS['piObj']->conf['allowUpdate']) {
+				$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('fe_users', 'uid='.(int)$fe_user['uid'], array('tx_dixeasylogin_openid' => $identifier) );
+				return $GLOBALS['piObj']->pi_getLL('connect_success'); 
+			}
+			return 'how come you see this message?'; // should never be reached
+		}
+
+		// from this point on we are sure that the user is not logged in yet
+		if (!$user['uid'] && $GLOBALS['piObj']->conf['allowCreate']) {
 			$user = self::createUser($identifier, $userinfo);
 		}
+
 		if ($user['uid']) {
 			self::login($user);
 			self::redirectToSelf();
@@ -47,7 +67,7 @@ class tx_dixeasylogin_div {
 	static function login($user) {
 		$GLOBALS['TSFE']->fe_user->checkPid=0; //do not use a particular pid
 		$GLOBALS['TSFE']->fe_user->createUserSession($user);
-		$GLOBALS['TSFE']->fe_user->user = $user;
+		$GLOBALS['TSFE']->fe_user->user = $GLOBALS['TSFE']->fe_user->fetchUserSession();
 	}
 
 	static function redirectToSelf() {
@@ -56,7 +76,11 @@ class tx_dixeasylogin_div {
 		t3lib_utility_Http::redirect($url);
 	}
 
-	static function fetchUser($identifier) {
+	/**
+	* @param string $identifier Identifier provided by the authorization mechanism e.g facebook-ID 
+	* @return array corresponding fe_user record
+	*/
+		static function fetchUserByIdentifier($identifier) {
 		$table = 'fe_users';
 		$where = sprintf('tx_dixeasylogin_openid = %s %s', $GLOBALS['TYPO3_DB']->fullQuoteStr($identifier, $table), $GLOBALS['piObj']->cObj->enableFields($table));
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $where);
@@ -89,7 +113,7 @@ class tx_dixeasylogin_div {
 			# no field like "timezone" in fe_users. incoming format: http://www.twinsun.com/tz/tz-link.htm (e.g.  "Europe/Paris" or "America/Los_Angeles")
 		);
 		$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $values);
-		$user = tx_dixeasylogin_div::fetchUser($identifier);
+		$user = tx_dixeasylogin_div::fetchUserByIdentifier($identifier);
 		return $user;
 	}
 

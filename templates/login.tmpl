@@ -1,4 +1,3 @@
-<h2>Login</h2> 
 <div id="tabs">
 	<ul>
 		<f:for each="{values.provider}" as="provider" key="type">
@@ -24,7 +23,18 @@
 							<f:if condition="{provider.withUsername}">
 								Username: <input type="text" name="{values.prefix}[userName]" /><br />
 							</f:if>
-							<input type="submit" value="Login with {provider.name}" />
+
+
+							<f:if condition="{values.user}">
+							<f:then>
+								<input type="submit" value="Connect with {provider.name} account" />
+							</f:then>
+							<f:else>
+								<input type="submit" value="Login with {provider.name}" />
+							</f:else>
+							</f:if>
+
+
 						</form>
 					</f:else>
 				</f:if>
@@ -39,7 +49,7 @@
 
 
 <script type="text/javascript">
-$(function() {
+jQuery(function($) {
 	$( "#tabs" ).tabs();
 });
 </script>

@@ -36,6 +36,11 @@ class tx_dixeasylogin_facebook { // uses oauth 2.0
 		return $error;
 	}
 
+	/**
+	* Redirect to facebook homepage to ask for permission of user to access credentials from facebook. The redirect hands over 
+	* the URL of the evoking website where the user is redirected to by facebook. If the user allowed to access credentials, next time the redirect will
+	* be done automatically without the user knowing it.
+	*/
 	function redirToProvider() {
 		$verifyUrl = t3lib_div::locationHeaderUrl($GLOBALS['piObj']->pi_linkTP_keepPIvars_url(array('action'=>'verify'),0,1));
 		if (strpos($verifyUrl, '?')) {
@@ -55,6 +60,9 @@ class tx_dixeasylogin_facebook { // uses oauth 2.0
 		return tx_dixeasylogin_div::loginFromIdentifier($userinfo['id'], $userinfo);
 	}
 
+	/**
+	 * @return string the OAuth Access token required for communication with Facebook's API
+	 */
 	function getToken($code, &$error) {
 		$response = tx_dixeasylogin_div::makeCURLRequest('https://graph.facebook.com/oauth/access_token', 'GET', array(
 			'client_id' => $this->provider['appId'],
@@ -79,6 +87,11 @@ class tx_dixeasylogin_facebook { // uses oauth 2.0
 		return $result['access_token'];
 	}
 
+	/**
+	* Function tries to get data from Facebook. Works if user is logged in in Facebook and accepts that data is handed over.
+	* 
+	* @return array the userinfo received from Facebook fields such as id, nickname, fullname, first_name, last_name, email 
+	*/
 	function getUserInfo($token, &$error) {
 		$response = tx_dixeasylogin_div::makeCURLRequest('https://graph.facebook.com/me', 'GET', array('access_token' => $token));
 		$decoded = json_decode($response, true);

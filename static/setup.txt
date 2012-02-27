@@ -1,6 +1,7 @@
 plugin.tx_dixeasylogin_pi1 {
 	# take a look at the constants for more remarks
 	allowCreate = {$plugin.tx_dixeasylogin_pi1.allowCreate}
+	allowUpdate = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
 	user_pid = {$plugin.tx_dixeasylogin_pi1.user_pid}
 	usergroup = {$plugin.tx_dixeasylogin_pi1.usergroup}
 	pid_loginPage = {$plugin.tx_dixeasylogin_pi1.pid_loginPage}
@@ -15,27 +16,32 @@ plugin.tx_dixeasylogin_pi1 {
 		10.name = Google
 		10.url = https://www.google.com/
 		10.icon = EXT:dix_easylogin/res/icons/google.gif
+		10.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
 
 		20 = OPENID
 		20.name = Yahoo
 		20.url = https://me.yahoo.com/
 		20.icon = EXT:dix_easylogin/res/icons/yahoo.ico
+		20.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
 
 		30 = OPENID
 		30.name = myOpenID
 		30.url = http://###NAME###.myopenid.com/
 		30.icon = EXT:dix_easylogin/res/icons/myopenid.ico
+		30.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
 
 		40 = OPENID
 		40.name = Wordpress
 		40.url = http://###NAME###.wordpress.com/
 		40.icon = EXT:dix_easylogin/res/icons/wordpress.ico
+		40.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
 		
 		50 = FACEBOOK
 		50.name = facebook
 		50.icon = EXT:dix_easylogin/res/icons/facebook.jpg
 		50.appId = {$plugin.tx_dixeasylogin_pi1.facebook_appID}
 		50.appSecret = {$plugin.tx_dixeasylogin_pi1.facebook_appSecret}
+		50.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
 
 		# OAuth Version 1.0 as used by Twitter
 		60 = OAUTH1
@@ -58,6 +64,7 @@ plugin.tx_dixeasylogin_pi1 {
 			fullname = name
 			id = id
 		}
+		60.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
 	}
 
 	# possible values: nickname,email,fullname,postcode,country,prefix,firstname,lastname,suffix

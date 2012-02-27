@@ -6,6 +6,9 @@ plugin.tx_dixeasylogin_pi1 {
 		# if the user should be created when not already found in the database
 	allowCreate = 1
 
+		# if the user should be able to connect his login with a login provider when already authenticated
+	allowUpdate = 1
+
 		# where the fe_users records should be stored when created
 	user_pid = 6
 	

@@ -19,6 +19,7 @@
 			<label index="error_reqToken">Error while getting OAuth Request Token (%s)</label>
 			<label index="error_getting_accesstoken">Error: Could not get access token (%s)</label>
 			<label index="error_getting_userinfo">Error: While retrieving user details, the user id was empty</label>
+			<label index="connect_success">Account successfully connected!</label>
 
 			<label index="xxx">Mode</label>
 			<label index="xxx">Mode</label>
