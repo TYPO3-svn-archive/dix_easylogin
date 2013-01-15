@@ -44,7 +44,7 @@ class tx_dixeasylogin_openid {
 		if ($error) { return $error; }
 
 		$openid = t3lib_div::makeInstance('Dope_OpenID', $openid_url);
-		$openid->setReturnURL(t3lib_div::locationHeaderUrl('index.php?id='.$GLOBALS['TSFE']->id.'&tx_dixeasylogin_pi1[action]=verify'));
+		$openid->setReturnURL(tx_dixeasylogin_div::getVerifyUrl());
 		$trustRoot = t3lib_div::locationHeaderUrl('/');
 		$openid->SetTrustRoot($trustRoot);
 		if ($GLOBALS['piObj']->conf['optionalInfo']) {

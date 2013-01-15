@@ -6,6 +6,8 @@ plugin.tx_dixeasylogin_pi1 {
 	usergroup = {$plugin.tx_dixeasylogin_pi1.usergroup}
 	pid_loginPage = {$plugin.tx_dixeasylogin_pi1.pid_loginPage}
 	
+	preserveGETvars = tx_ttnews
+	
 	provider {
 		5 = CONTENTELEMENT
 		5.name = User/Pass
@@ -65,6 +67,31 @@ plugin.tx_dixeasylogin_pi1 {
 			id = id
 		}
 		60.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
+
+		70 = OAUTH1
+		70.name = Xing
+		70.icon = EXT:dix_easylogin/res/icons/xing.png
+		# sigMethod is one of these: HMAC_SHA1   PLAINTEXT
+		70.sigMethod = HMAC_SHA1
+		70.consumerKey = {$plugin.tx_dixeasylogin_pi1.xing_consumerKey}
+		70.consumerSecret = {$plugin.tx_dixeasylogin_pi1.xing_consumerSecret}
+		70.requestTokenUrl = https://api.xing.com/v1/request_token
+		70.authorizeUrl = https://api.xing.com/v1/authorize
+		70.accessTokenUrl = https://api.xing.com/v1/access_token
+		# you can use markers in the requestProfileUrl, the corresponding values from the accessToken-response will be substituted
+		70.requestProfileUrl = https://api.xing.com/v1/users/me
+		70.profileMap {
+			# format:
+			# key = response parameter
+			# possible keys: see https://dev.xing.com/docs/get/users/me
+			nickname = display_name
+			fullname = display_name
+			email = active_email
+			id = id
+		}
+		70.showWhenLoggedIn = {$plugin.tx_dixeasylogin_pi1.allowUpdate}
+
+
 	}
 
 	# possible values: nickname,email,fullname,postcode,country,prefix,firstname,lastname,suffix
@@ -82,14 +109,14 @@ page.2 {
 }
 
 [globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.include_jQuery}]
-	page.headerData.851 = TEXT
-	page.headerData.851.value = <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+	page.includeJSlibs.jQuery = https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js
+	page.includeJSlibs.jQuery.external = 1
 	
-	page.headerData.852 = TEXT
-	page.headerData.852.value = <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+	page.includeJSlibs.jQueryUI = http://code.jquery.com/ui/1.9.2/jquery-ui.js
+	page.includeJSlibs.jQueryUI.external = 1
 
-	page.headerData.853 = TEXT
-	page.headerData.853.value = <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" type="text/css" />
+	page.includeCSS.jQueryUI = http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css
+	page.includeCSS.jQueryUI.external = 1
 [global]
 [globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.felogin}]
 	plugin.tx_dixeasylogin_pi1.provider.5 >
@@ -111,4 +138,7 @@ page.2 {
 [global]
 [globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.twitter}]
 	plugin.tx_dixeasylogin_pi1.provider.60 >
+[global]
+[globalVar = LIT:1 = {$plugin.tx_dixeasylogin_pi1.disable.xing}]
+	plugin.tx_dixeasylogin_pi1.provider.70 >
 [global]

@@ -40,12 +40,12 @@ class tx_dixeasylogin_div {
 	 * @return  string   Message to be displayed to the user (success / error)
 	 */
 	static function loginFromIdentifier($identifier, $userinfo) {
-		$user = tx_dixeasylogin_div::fetchUserByIdentifier($identifier);
+		$user = self::fetchUserByIdentifier($identifier);
 		$fe_user = $GLOBALS['TSFE']->fe_user->fetchUserSession();
 		
 		if ($fe_user['uid']) { // user already logged in -> try to update the identifier
 			if ($GLOBALS['piObj']->conf['allowUpdate']) {
-				$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('fe_users', 'uid='.(int)$fe_user['uid'], array('tx_dixeasylogin_openid' => $identifier) );
+				self::linkIdentifier2User($identifier, (int)$fe_user['uid']);
 				return $GLOBALS['piObj']->pi_getLL('connect_success'); 
 			}
 			return 'how come you see this message?'; // should never be reached
@@ -71,23 +71,64 @@ class tx_dixeasylogin_div {
 	}
 
 	static function redirectToSelf() {
-		#$url =  t3lib_div::locationHeaderUrl($GLOBALS['piObj']->pi_getPageLink($GLOBALS['TSFE']->id));
-		$url = $GLOBALS['piObj']->cObj->getTypoLink_URL($GLOBALS['TSFE']->id, array('logintype' => 'login'));
+		$url = self::getSelfUrl(array('logintype' => 'login'));
 		t3lib_utility_Http::redirect($url);
+	}
+	
+	static public function getVerifyUrl() {
+		return t3lib_div::locationHeaderUrl(
+			self::getSelfUrl(array('tx_dixeasylogin_pi1' => array('action'=>'verify')))
+		);
+	}
+	
+	static public function getSelfUrl(array $params=array()) {
+		$preservedVars = self::getPreservedVars();
+		$vars = array_merge_recursive($preservedVars, $params); // params overrules preservedVars
+		$url = $GLOBALS['TSFE']->cObj->getTypoLink_URL($GLOBALS['TSFE']->id, $vars);
+		return $url;
+	}
+	
+	// recursive
+	static protected function array_intersect_key_recursive(array $arr1, array $arr2) {
+		$result = array();
+		foreach ($arr1 as $k1=>$v1) {
+			if (!isset($arr2[$k1])) { continue; }
+			if (is_array($v1) && is_array($arr2[$k1])) {
+				if ($merged = self::array_intersect_key_recursive($v1, $arr2[$k1])) {
+					$result[$k1] = $merged;
+				}
+			} elseif (!is_array($arr2[$k1])) {
+				$result[$k1] = $v1;
+			}
+		}
+		return $result;
+	}
+	
+
+	static protected function getPreservedVars() {
+		$getVars = t3lib_div::_GET();
+		$conf = $GLOBALS['piObj']->conf['preserveGETvars'];
+		if ('all' == $conf) { return $getVars; }
+		$conf = strtr($conf, '&?= ', ''); // basic validation
+		$conf = str_replace(',', '=1&', $conf).'=1'; // transform to url style
+		parse_str($conf, $params);
+		$keep = self::array_intersect_key_recursive((array)$getVars, (array)$params);
+		return $keep;
 	}
 
 	/**
 	* @param string $identifier Identifier provided by the authorization mechanism e.g facebook-ID 
 	* @return array corresponding fe_user record
 	*/
-		static function fetchUserByIdentifier($identifier) {
-		$table = 'fe_users';
-		$where = sprintf('tx_dixeasylogin_openid = %s %s', $GLOBALS['TYPO3_DB']->fullQuoteStr($identifier, $table), $GLOBALS['piObj']->cObj->enableFields($table));
+	static function fetchUserByIdentifier($identifier) {
+		$table = 'tx_dixeasylogin_identifiers';
+		$where = sprintf('identifier = %s %s', $GLOBALS['TYPO3_DB']->fullQuoteStr($identifier, $table), $GLOBALS['piObj']->cObj->enableFields($table));
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $where);
-		return $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		return $GLOBALS['piObj']->pi_getRecord('fe_users', $row['user']);
 	}
 
-	function createUser($identifier, $userinfo) {
+	static function createUser($identifier, $userinfo) {
 		# debugster ($userinfo); debugster ($_GET); exit();
 		// possible keys in $userinfo: nickname,email,fullname,dob,gender,postcode,country,language,timezone,prefix,firstname,lastname,suffix
 		// @see http://openid.net/specs/openid-simple-registration-extension-1_0.html#response_format
@@ -95,11 +136,11 @@ class tx_dixeasylogin_div {
 		$values = array(
 			'email' => $userinfo['email'],
 			'username' => ($userinfo['nickname'] ? $userinfo['nickname'] : $userinfo['email']), // TODO: check if username is unique
-			'tx_dixeasylogin_openid' => $identifier,
+			#'tx_dixeasylogin_openid' => $identifier,
 			'pid' => $GLOBALS['piObj']->conf['user_pid'],
 			'crdate' => time(),
 			'tstamp' => time(),
-			'password' => md5(microtime(1)),
+			'password' => t3lib_div::getRandomHexString(32),
 			'usergroup' => $GLOBALS['piObj']->conf['usergroup'],
 			'name' => $userinfo['fullname'] ? $userinfo['fullname'] : trim($userinfo['firstname'].' '.$userinfo['lastname'].' '.$userinfo['suffix']),
 			'title' => $userinfo['prefix'],
@@ -112,8 +153,42 @@ class tx_dixeasylogin_div {
 			# no field like "language" in fe_users. incoming format: http://www.loc.gov/standards/iso639-2/php/code_list.php (e.g. de or de-DE)
 			# no field like "timezone" in fe_users. incoming format: http://www.twinsun.com/tz/tz-link.htm (e.g.  "Europe/Paris" or "America/Los_Angeles")
 		);
+		$values['name'] = trim($values['name']) ? $values['name'] : $userinfo['nickname'];
+		$values = self::normalizeUser($values);
 		$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $values);
-		$user = tx_dixeasylogin_div::fetchUserByIdentifier($identifier);
+		$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+		self::linkIdentifier2User($identifier, $uid);
+		$user = self::fetchUserByIdentifier($identifier);
+		return $user;
+	}
+	
+	static function linkIdentifier2User($identifier, $uid) {
+		$table = 'tx_dixeasylogin_identifiers';
+		$where = sprintf('identifier = %s %s', $GLOBALS['TYPO3_DB']->fullQuoteStr($identifier, $table), $GLOBALS['piObj']->cObj->enableFields($table));
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $where);
+		$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		$type = $GLOBALS["TSFE"]->fe_user->getKey("ses", "easylogin_loginType");
+		$values = array(
+			'user' => $uid,
+			'tstamp' => time(),
+			'conn_type' => $type,
+			'conn_name' => $GLOBALS['piObj']->conf['provider.'][$type.'.']['name'],
+		);
+		if ($row['uid']) {
+			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid = '.$row['uid'], $values);
+		} else {
+			$values['identifier'] = $identifier;
+			$values['crdate'] = time();
+			$values['pid'] = $GLOBALS['piObj']->conf['user_pid'];
+			$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $values);
+		}
+	}
+	
+	// lower, nospace, uniqueInPid
+	static function normalizeUser($user) {
+		$name = str_replace(' ', '', strtolower($user['username']));
+		$tcemain = t3lib_div::makeInstance("t3lib_TCEmain");
+		$user['username'] = $tcemain->getUnique('fe_users', 'username', $name, 0, $user['pid']);
 		return $user;
 	}
 
@@ -150,7 +225,7 @@ class tx_dixeasylogin_div {
 	static function renderFluidTemplate($filename, $values) {
 		$renderer = t3lib_div::makeInstance('Tx_Fluid_View_StandaloneView');
 		$path = $GLOBALS['piObj']->conf['template_path'];
-		if (substr($path, -1) != '/') { $path .= '/'; }
+		if (substr($path, -1) != DIRECTORY_SEPARATOR) { $path .= DIRECTORY_SEPARATOR; }
 
 		$controllerContext = t3lib_div::makeInstance('Tx_Extbase_MVC_Controller_ControllerContext');
 		$controllerContext->setRequest(t3lib_div::makeInstance('Tx_Extbase_MVC_Request'));
@@ -171,7 +246,35 @@ class tx_dixeasylogin_div {
 		}
 		return $filename;
 	}
+	
+	static function getAssociatedProvider($uid) {
+		$result = array();
+		$table = 'tx_dixeasylogin_identifiers';
+		$where = sprintf('user = %d %s', $uid, $GLOBALS['piObj']->cObj->enableFields($table));
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $where);
+		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			$result[$row['conn_type']] = $row;
+		}
+		return $result;
+	}
 
+}
+
+class Tx_Dix_ViewHelpers_DispViewHelper extends Tx_Fluid_Core_ViewHelper_AbstractViewHelper {
+	/**
+	 * @param $obj  object Object
+	 * @param $prop	string Property
+	 */	 	
+	public function render($obj,$prop) {
+		if(is_object($obj)) {
+			return $obj->$prop;
+		} elseif(is_array($obj)) {
+			if(array_key_exists($prop, $obj)) {
+				return $obj[$prop];
+			}
+		}
+		return NULL;
+	}
 }
 
 

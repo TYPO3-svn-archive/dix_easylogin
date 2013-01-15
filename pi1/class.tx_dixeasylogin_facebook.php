@@ -42,9 +42,10 @@ class tx_dixeasylogin_facebook { // uses oauth 2.0
 	* be done automatically without the user knowing it.
 	*/
 	function redirToProvider() {
-		$verifyUrl = t3lib_div::locationHeaderUrl($GLOBALS['piObj']->pi_linkTP_keepPIvars_url(array('action'=>'verify'),0,1));
+		$verifyUrl = tx_dixeasylogin_div::getVerifyUrl();
+		
 		if (strpos($verifyUrl, '?')) {
-			return sprintf($GLOBALS['piObj']->pi_getLL('qmark_in_url'), $verifyUrl);
+			throw new Exception(sprintf($GLOBALS['piObj']->pi_getLL('qmark_in_url'), $verifyUrl));
 		}
 		$requiredInfo = 'email';
 		$location = sprintf('https://www.facebook.com/dialog/oauth?client_id=%s&redirect_uri=%s&scope=%s', $this->provider['appId'], urlencode($verifyUrl), $requiredInfo);
@@ -66,7 +67,7 @@ class tx_dixeasylogin_facebook { // uses oauth 2.0
 	function getToken($code, &$error) {
 		$response = tx_dixeasylogin_div::makeCURLRequest('https://graph.facebook.com/oauth/access_token', 'GET', array(
 			'client_id' => $this->provider['appId'],
-			'redirect_uri' => t3lib_div::locationHeaderUrl($GLOBALS['piObj']->pi_linkTP_keepPIvars_url(array('action'=>'verify'),0,1)), // must not contain a question mark "?"
+			'redirect_uri' => tx_dixeasylogin_div::getVerifyUrl(), // must not contain a question mark "?"
 			'client_secret' => $this->provider['appSecret'],
 			'code' => $code,
 		));

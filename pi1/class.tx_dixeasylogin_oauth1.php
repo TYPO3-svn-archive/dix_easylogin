@@ -47,6 +47,7 @@ class tx_dixeasylogin_oauth1 {
 
 	function getRequestToken() {
 	  $req_req = OAuthRequest::from_consumer_and_token($this->consumer, NULL, "GET", $this->provider['requestTokenUrl'], array());
+	  $req_req->set_parameter('oauth_callback', tx_dixeasylogin_div::getVerifyUrl()); // xing expects this parameter when requesting the request token; twitter when redirecting to provider
 	  $req_req->sign_request($this->sigMethod, $this->consumer, NULL);
 
 		$response = tx_dixeasylogin_div::makeCURLRequest((string)$req_req, 'GET', array());
@@ -61,7 +62,7 @@ class tx_dixeasylogin_oauth1 {
 	}
 
 	function redirToProvider() { // authorize
-		$callback_url = t3lib_div::locationHeaderUrl($GLOBALS['piObj']->pi_linkTP_keepPIvars_url(array('action' => 'verify'),0,1));
+		$callback_url = tx_dixeasylogin_div::getVerifyUrl();
   	$auth_url = $this->provider['authorizeUrl'] . '?oauth_token='.$this->oauth_token.'&oauth_callback='.urlencode($callback_url);
 	  header("Location: $auth_url");
 	}
@@ -73,6 +74,9 @@ class tx_dixeasylogin_oauth1 {
 
 		$tokenObj = t3lib_div::makeInstance('OAuthConsumer', $this->oauth_token, $this->oauth_token_secret);
 	  $acc_req = OAuthRequest::from_consumer_and_token($this->consumer, $tokenObj, "GET", $this->provider['accessTokenUrl'], array());
+	  if ($verifier = t3lib_div::_GP('oauth_verifier')) {
+	  	$acc_req->set_parameter('oauth_verifier', $verifier); // xing expects this parameter
+	  }
 	  $acc_req->sign_request($this->sigMethod, $this->consumer, $tokenObj);
 
 		$response = tx_dixeasylogin_div::makeCURLRequest((string)$acc_req, 'GET', array());
@@ -82,9 +86,11 @@ class tx_dixeasylogin_oauth1 {
 	  // problem here: according to oauth specs there is no need for a response parameter identifing the user. 
 		// twitter uses "user_id" but other oauth providers may use "userid", "uid", "user", "id" or worst: nothing at all
 		if (!$params['oauth_token']) {
-			$error = sprintf($GLOBALS['piObj']->pi_getLL('error_getting_accesstoken'), $request); // Error: Could not get access token (%s)
+			$error = sprintf($GLOBALS['piObj']->pi_getLL('error_getting_accesstoken'), $response); // Error: Could not get access token (%s)
 			return $error; 
 		}
+	  $this->oauth_token = $params['oauth_token'];
+	  $this->oauth_token_secret = $params['oauth_token_secret'];
 		
 		$userinfo = $this->getUserInfo($params, $error);
 		if ($error) { return $error; }
@@ -103,6 +109,7 @@ class tx_dixeasylogin_oauth1 {
 
 		$response = tx_dixeasylogin_div::makeCURLRequest((string)$req, 'GET', array());
 		$details = json_decode($response, true);
+		if ($details['users']) { $details = $details['users']; } // when the details are stored in an object capsulated in an array capsulated in an object (xing)
 		if ($details[0]) { $details = $details[0]; } // when the details are stored in an object capsulated in an array (twitter)
 		$userinfo = array();
 		foreach ($this->provider['profileMap.'] as $dbField => $detailsField) {
@@ -112,6 +119,7 @@ class tx_dixeasylogin_oauth1 {
 			$error = $GLOBALS['piObj']->pi_getLL('error_getting_userinfo'); // Error: While retrieving user details, the user id was empty
 		}
 		$userinfo['id'] = 'oauth1-'.$this->provider['key'].'-'.$userinfo['id'];
+
 		return $userinfo;
 	}
 	

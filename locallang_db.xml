@@ -8,6 +8,12 @@
 		<languageKey index="default" type="array">
 			<label index="tt_content.list_type_pi1">Easy Login</label>
 			<label index="fe_users.tx_dixeasylogin_openid">OpenID Identifier</label>
+			<label index="tx_dixeasylogin_identifiers">Identifiers</label>
+			<label index="tx_dixeasylogin_identifiers.user">Frontend User</label>
+			<label index="tx_dixeasylogin_identifiers.conn_type">Connection Type</label>
+			<label index="tx_dixeasylogin_identifiers.conn_name">Connection Name</label>
+			<label index="tx_dixeasylogin_identifiers.identifier">Identifier</label>
+			<label index="fe_users.tx_dixeasylogin_identifiers">Identifiers</label>
 		</languageKey>
 	</data>
 </T3locallang>

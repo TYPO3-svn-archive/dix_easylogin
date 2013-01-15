@@ -7,6 +7,8 @@ Create a facebook app (https://developers.facebook.com/apps) with your domain an
 
 Create a twitter app (https://dev.twitter.com/apps/new) with your domain and write down the Consumer ID and the Consumer Secret
 
+Create a xing app (https://dev.xing.com/applications) with your domain and write down the Consumer ID and the Consumer Secret
+
 1) Install extension
 2) Insert a content element "login" on any page, can be on a page not visible to the user (e.g. "hide in menu"). 
    Write down uid of that record.
@@ -15,7 +17,7 @@ Create a twitter app (https://dev.twitter.com/apps/new) with your domain and wri
 4) Include the static TypoScript, insert these constants into your TS template and fit them to your needs:
 
 plugin.tx_dixeasylogin_pi1 {
-		# if jQuery, jQueryUI and the lightness theme should be included by default. 
+		# if jQuery, jQueryUI and the base theme should be included by default. 
 		# if turned off, you have to take care for yourself that the libraries are loaded (smart if other extensions also include jQuery)
 	include_jQuery = 1
 
@@ -42,15 +44,20 @@ plugin.tx_dixeasylogin_pi1 {
 		# register a twitter app to get these two values
 	twitter_consumerKey = YOUR-CONSUMER-KEY
 	twitter_consumerSecret = YOUR-CONSUMER-SECRET
+
+		# register a xing app to get these two values
+	xing_consumerKey = YOUR-CONSUMER-KEY
+	xing_consumerSecret = YOUR-CONSUMER-SECRET
 	
 		# enable or disable login methods
-	methods.felogin = 1
-	methods.google = 1
-	methods.yahoo = 1
-	methods.myopenid = 1
-	methods.wordpress = 1
-	methods.facebook = 1
-	methods.twitter = 1
+	disable.felogin = 0
+	disable.google = 0
+	disable.yahoo = 0
+	disable.myopenid = 0
+	disable.wordpress = 0
+	disable.facebook = 0
+	disable.twitter = 0
+	disable.xing = 0
 }
 
 See ext/dix_easylogin/ext_typoscript_setup.txt for further configuration

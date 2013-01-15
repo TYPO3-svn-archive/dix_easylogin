@@ -1,3 +1,22 @@
+2013-01-15 Markus Kappe  <markus.kappe@dix.at>
+	* new jQuery + UI version 
+	* jQuery UI theme changed from lighness to base
+	* Inclusion of jQuery via includeJSlibs instead of headerData
+	* Bugfix: href of tabs was incorrect and did not work with new version of jQuery
+	* Label of extension configuration re-texted for understandability
+	* Added Xing
+	* Some bugfixes and	changes on OAuth1 for Xing to work
+	* made fe_users username lowercase, noSpace, uniqueInPid
+	* Enabled connecting user to multiple providers (http://forge.typo3.org/issues/34990)
+	* Update script due to database changes
+
+2012-03-14 Markus Kappe  <markus.kappe@dix.at>
+	* http://forge.typo3.org/issues/34440 (realurl autoconf)
+	* http://forge.typo3.org/issues/33404 (preserveGETvars)
+
+2012-03-03 Markus Kappe  <markus.kappe@dix.at>
+	* Security fix
+
 2012-02-27 Markus Kappe  <markus.kappe@dix.at>
 	* http://forge.typo3.org/issues/33500
 	* http://forge.typo3.org/issues/33498

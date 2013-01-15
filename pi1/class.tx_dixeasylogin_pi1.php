@@ -25,6 +25,7 @@
 // @requires cUrl, extbase, fluid
 
 require_once(PATH_tslib.'class.tslib_pibase.php');
+require_once(PATH_t3lib.'class.t3lib_tcemain.php');
 require_once(t3lib_extMgm::extPath("dix_easylogin")."res/dope/class.dopeopenid.php");
 require_once(t3lib_extMgm::extPath("dix_easylogin")."res/oauth/OAuth.php");
 require_once(t3lib_extMgm::extPath("dix_easylogin")."res/yadis/Yadis.php");
@@ -69,7 +70,7 @@ class tx_dixeasylogin_pi1 extends tslib_pibase {
 		$this->pi_USER_INT_obj = 1;    // Configuring so caching is not expected. This value means that no cHash params are ever set. We do this, because it's a USER_INT object!
 
 		if ($this->piVars['action'] == 'xrds') {
-			$content = tx_dixeasylogin_div::renderFluidTemplate('xrds.tmpl', t3lib_div::locationHeaderUrl('index.php?id='.$GLOBALS['TSFE']->id.'&tx_dixeasylogin_pi1[action]=verify'));
+			$content = tx_dixeasylogin_div::renderFluidTemplate('xrds.tmpl', tx_dixeasylogin_div::getVerifyUrl());
 			echo $content; exit();
 		}
 		$this->providers = $this->getProvider();
@@ -101,11 +102,13 @@ class tx_dixeasylogin_pi1 extends tslib_pibase {
 		
 		$values = array(
 			'provider' => $this->providers,
-			'formaction' => $this->pi_getPageLink($GLOBALS['TSFE']->id),
+			'formaction' => tx_dixeasylogin_div::getSelfUrl(),
+			'anchorPrefix' => t3lib_div::getIndpEnv('REQUEST_URI'),
 			'prefix' => $this->prefixId,
 			'user' => $GLOBALS['TSFE']->fe_user->user,
 			'error' => $error,
 			'constants' => array('CONTENTELEMENT' => 'CONTENTELEMENT'),
+			'associated' => tx_dixeasylogin_div::getAssociatedProvider($GLOBALS['TSFE']->fe_user->user['uid']),
 		);
 
 		$content = tx_dixeasylogin_div::renderFluidTemplate('login.tmpl', $values);

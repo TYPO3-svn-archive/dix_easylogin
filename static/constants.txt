@@ -29,6 +29,10 @@ plugin.tx_dixeasylogin_pi1 {
 		# register a twitter app to get these two values
 	twitter_consumerKey = YOUR-CONSUMER-KEY
 	twitter_consumerSecret = YOUR-CONSUMER-SECRET
+
+		# register a xing app to get these two values
+	xing_consumerKey = YOUR-CONSUMER-KEY
+	xing_consumerSecret = YOUR-CONSUMER-SECRET
 	
 		# enable or disable login methods
 	disable.felogin = 0
@@ -38,5 +42,6 @@ plugin.tx_dixeasylogin_pi1 {
 	disable.wordpress = 0
 	disable.facebook = 0
 	disable.twitter = 0
+	disable.xing = 0
 	
 }
